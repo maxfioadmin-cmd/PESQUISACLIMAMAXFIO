@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pesquisa de Clima Organizacional — Maxfio</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f6f4; color: #1a1a1a; min-height: 100vh; padding: 2rem 1rem 4rem; }
+    .survey-wrap { max-width: 680px; margin: 0 auto; }
+
+    .survey-header { background: #fff; border: 1px solid #dde8e3; border-radius: 12px; padding: 1.75rem 2rem; margin-bottom: 1.5rem; border-top: 4px solid #1D9E75; }
+    .survey-header h1 { font-size: 22px; font-weight: 600; color: #0F6E56; margin-bottom: 0.5rem; }
+    .survey-header p { font-size: 14px; color: #555; line-height: 1.65; }
+    .confidential-badge { display: inline-flex; align-items: center; gap: 6px; background: #e6f5ee; color: #0F6E56; font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px; margin-top: 0.85rem; }
+
+    .progress-bar { height: 4px; background: #dde8e3; border-radius: 2px; margin-bottom: 1.5rem; overflow: hidden; }
+    .progress-fill { height: 100%; background: #1D9E75; border-radius: 2px; width: 0%; transition: width 0.3s ease; }
+
+    .section-title { font-size: 11px; font-weight: 700; color: #0F6E56; text-transform: uppercase; letter-spacing: 0.08em; margin: 2rem 0 0.75rem 4px; }
+    .card { background: #fff; border: 1px solid #dde8e3; border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 0.75rem; }
+    .card > .q-label { font-size: 14px; color: #1a1a1a; line-height: 1.55; display: block; margin-bottom: 0.85rem; }
+    .q-label .num { color: #1D9E75; font-weight: 600; margin-right: 4px; }
+    .q-label .opt { color: #888; font-size: 12px; margin-left: 4px; }
+
+    .scale-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .scale-group input[type=radio] { display: none; }
+    .scale-item label { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .scale-btn { width: 46px; height: 46px; border-radius: 8px; border: 1px solid #cdddd6; background: #f4f9f6; font-size: 16px; font-weight: 500; color: #666; display: flex; align-items: center; justify-content: center; transition: all 0.12s; cursor: pointer; user-select: none; }
+    .scale-btn:hover { border-color: #1D9E75; color: #1D9E75; background: #e6f5ee; }
+    .scale-group input[type=radio]:checked + label .scale-btn { background: #1D9E75; border-color: #1D9E75; color: #fff; }
+    .scale-labels { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-top: 6px; padding: 0 2px; }
+
+    .yn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    .yn-group input[type=radio] { display: none; }
+    .yn-btn { padding: 9px 24px; border-radius: 8px; border: 1px solid #cdddd6; background: #f4f9f6; font-size: 14px; color: #555; cursor: pointer; transition: all 0.12s; user-select: none; }
+    .yn-btn:hover { border-color: #1D9E75; color: #1D9E75; }
+    .yn-group input[type=radio]:checked + label .yn-btn { background: #1D9E75; border-color: #1D9E75; color: #fff; }
+
+    .check-group { display: flex; flex-direction: column; gap: 10px; }
+    .check-group input[type=checkbox] { display: none; }
+    .check-item label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; color: #1a1a1a; }
+    .check-box { width: 20px; height: 20px; min-width: 20px; border-radius: 5px; border: 1px solid #cdddd6; background: #f4f9f6; display: flex; align-items: center; justify-content: center; transition: all 0.12s; }
+    .check-group input[type=checkbox]:checked + label .check-box { background: #1D9E75; border-color: #1D9E75; }
+    .check-group input[type=checkbox]:checked + label .check-box::after { content: ''; width: 11px; height: 6px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translateY(-1px); display: block; }
+
+    input[type=text], textarea { width: 100%; background: #f9faf9; border: 1px solid #cdddd6; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #1a1a1a; font-family: inherit; outline: none; resize: vertical; transition: border-color 0.15s, box-shadow 0.15s; }
+    input[type=text]:focus, textarea:focus { border-color: #1D9E75; box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
+    textarea { min-height: 95px; }
+
+    .conditional { display: none; margin-top: 12px; }
+    .conditional.active { display: block; }
+
+    .submit-area { text-align: center; margin-top: 2.25rem; }
+    .anon-note { font-size: 12px; color: #888; margin-bottom: 1rem; }
+    .submit-btn { background: #1D9E75; color: #fff; border: none; border-radius: 8px; padding: 14px 48px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+    .submit-btn:hover { background: #0F6E56; }
+    .submit-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+    @media (max-width: 500px) { .scale-btn { width: 40px; height: 40px; font-size: 14px; } .yn-btn { padding: 8px 16px; font-size: 13px; } }
+  </style>
+</head>
+<body>
+<div class="survey-wrap">
+  <div class="survey-header">
+    <h1>Pesquisa de Clima Organizacional</h1>
+    <p>Sua opinião é fundamental para construirmos um ambiente de trabalho cada vez melhor. Todas as respostas são tratadas com <strong>total confidencialidade</strong>. Os resultados são analisados de forma agregada e nenhum respondente é identificado.</p>
+    <div class="confidential-badge">&#128274; Anônimo e confidencial</div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+  <form action="/enviar" method="POST" id="survey-form">
+
+    <div class="section-title">&#128100; Identificação (opcional)</div>
+    <div class="card">
+      <label class="q-label">Nome completo <span class="opt">(deixe em branco para manter o anonimato)</span></label>
+      <input type="text" name="nome" placeholder="Deixe em branco para manter o anonimato" />
+    </div>
+    <div class="card">
+      <label class="q-label">Setor <span class="opt">(não obrigatório)</span></label>
+      <input type="text" name="setor" placeholder="Ex: Financeiro, Operações, RH..." />
+    </div>
+
+    <div class="section-title">&#127970; Imagem e satisfação geral</div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">1.</span> Qual o seu nível de satisfação geral com a empresa?</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q1" id="q1-{{v}}" value="{{v}}"><label for="q1-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">2.</span> Você acredita que a empresa possui uma boa imagem perante parceiros, clientes e colaboradores?</label>
+      <div class="yn-group">
+        <div><input type="radio" name="q2" id="q2-s" value="Sim"><label for="q2-s"><span class="yn-btn">Sim</span></label></div>
+        <div><input type="radio" name="q2" id="q2-p" value="Parcialmente"><label for="q2-p"><span class="yn-btn">Parcialmente</span></label></div>
+        <div><input type="radio" name="q2" id="q2-n" value="Não"><label for="q2-n"><span class="yn-btn">Não</span></label></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">3.</span> Você sente orgulho de trabalhar aqui?</label>
+      <div class="yn-group">
+        <div><input type="radio" name="q3" id="q3-s" value="Sim"><label for="q3-s"><span class="yn-btn">Sim</span></label></div>
+        <div><input type="radio" name="q3" id="q3-p" value="Às vezes"><label for="q3-p"><span class="yn-btn">Às vezes</span></label></div>
+        <div><input type="radio" name="q3" id="q3-n" value="Não"><label for="q3-n"><span class="yn-btn">Não</span></label></div>
+      </div>
+    </div>
+
+    <div class="section-title">&#10084;&#65039; Clima, cultura e relacionamentos</div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">4.</span> Nível de satisfação com o clima e a cultura organizacional na Maxfio</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q4" id="q4-{{v}}" value="{{v}}"><label for="q4-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">5.</span> Nível de satisfação com o relacionamento profissional com colegas de trabalho</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q8" id="q8-{{v}}" value="{{v}}"><label for="q8-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">6.</span> Nível de satisfação com o relacionamento profissional com seus superiores</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q9" id="q9-{{v}}" value="{{v}}"><label for="q9-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="section-title">&#128101; Liderança e gestão</div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">7.</span> Nível de satisfação com o reconhecimento do bom desempenho e valorização de colaboradores</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q5" id="q5-{{v}}" value="{{v}}"><label for="q5-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">8.</span> Nível de satisfação com a orientação para a realização das tarefas diárias</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q7" id="q7-{{v}}" value="{{v}}"><label for="q7-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">9.</span> Nível de satisfação com a transparência na tomada de decisões pelos superiores</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q12" id="q12-{{v}}" value="{{v}}"><label for="q12-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">10.</span> Nível de satisfação com sua autonomia para propor novas ideias e soluções</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q13" id="q13-{{v}}" value="{{v}}"><label for="q13-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="section-title">&#9881;&#65039; Estrutura, comunicação e ética</div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">11.</span> Nível de satisfação com os recursos materiais (mesas, cadeiras, computadores, ferramentas)</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q6" id="q6-{{v}}" value="{{v}}"><label for="q6-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">12.</span> Nível de satisfação com a comunicação interna, procedimentos e processos da empresa</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q10" id="q10-{{v}}" value="{{v}}"><label for="q10-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">13.</span> Nível de satisfação com a política de ética e conduta</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q11" id="q11-{{v}}" value="{{v}}"><label for="q11-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="section-title">&#128176; Cargo, remuneração e benefícios</div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">14.</span> Nível de satisfação com sua carga de trabalho diária</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q14" id="q14-{{v}}" value="{{v}}"><label for="q14-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">15.</span> Nível de satisfação com seu cargo e salário</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q15" id="q15-{{v}}" value="{{v}}"><label for="q15-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">16.</span> Você acredita que seu salário está de acordo com o mercado?</label>
+      <div class="yn-group">
+        <div><input type="radio" name="q16" id="q16-s" value="Sim"><label for="q16-s"><span class="yn-btn">Sim</span></label></div>
+        <div><input type="radio" name="q16" id="q16-p" value="Parcialmente"><label for="q16-p"><span class="yn-btn">Parcialmente</span></label></div>
+        <div><input type="radio" name="q16" id="q16-n" value="Não"><label for="q16-n"><span class="yn-btn">Não</span></label></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">17.</span> Suas qualificações e habilidades técnicas estão de acordo com o exigido para o seu cargo?</label>
+      <div class="yn-group">
+        <div><input type="radio" name="q17" id="q17-s" value="Sim"><label for="q17-s"><span class="yn-btn">Sim</span></label></div>
+        <div><input type="radio" name="q17" id="q17-p" value="Parcialmente"><label for="q17-p"><span class="yn-btn">Parcialmente</span></label></div>
+        <div><input type="radio" name="q17" id="q17-n" value="Não"><label for="q17-n"><span class="yn-btn">Não</span></label></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">18.</span> Nível de satisfação com os benefícios que você recebe</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q18" id="q18-{{v}}" value="{{v}}"><label for="q18-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">19.</span> Selecione até 2 benefícios interessantes como possibilidade futura</label>
+      <div class="check-group">
+        {% for b in ["Plano de saúde", "Vale-alimentação / refeição", "Plano odontológico", "Auxílio educação", "Gympass / academia", "Vale-combustível / transporte", "Flexibilidade de horário", "Home office parcial"] %}
+        <div class="check-item"><input type="checkbox" name="beneficios" id="b-{{loop.index}}" value="{{b}}"><label for="b-{{loop.index}}"><span class="check-box"></span>{{b}}</label></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="section-title">&#127979; Desenvolvimento e crescimento</div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">20.</span> Você tem interesse em desempenhar outras funções dentro da Maxfio?</label>
+      <div class="yn-group">
+        <div><input type="radio" name="q20" id="q20-s" value="Sim" onchange="document.getElementById('q20-area').classList.add('active')"><label for="q20-s"><span class="yn-btn">Sim</span></label></div>
+        <div><input type="radio" name="q20" id="q20-n" value="Não" onchange="document.getElementById('q20-area').classList.remove('active')"><label for="q20-n"><span class="yn-btn">Não</span></label></div>
+      </div>
+      <div class="conditional" id="q20-area">
+        <input type="text" name="q20_area" placeholder="Informe a área de interesse..." />
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">21.</span> Nível de satisfação com os treinamentos e desenvolvimento interno (cursos, workshops, palestras)</label>
+      <div class="scale-group">
+        {% for v in [1,2,3,4,5] %}
+        <div class="scale-item"><input type="radio" name="q21" id="q21-{{v}}" value="{{v}}"><label for="q21-{{v}}"><span class="scale-btn">{{v}}</span></label></div>
+        {% endfor %}
+      </div>
+      <div class="scale-labels"><span>Muito insatisfeito</span><span>Muito satisfeito</span></div>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">22.</span> Dentre as iniciativas do programa já realizadas, qual(is) você percebeu melhor eficácia ou benefícios?</label>
+      <textarea name="q22" placeholder="Descreva sua percepção..."></textarea>
+    </div>
+
+    <div class="section-title">&#128172; Percepções e sugestões</div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">23.</span> O que você sugere como próximas ações da empresa para o próximo semestre?</label>
+      <textarea name="q23" placeholder="Sua sugestão é muito importante..."></textarea>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">24.</span> O que faz você se sentir confiante e seguro na Maxfio? O que te faz bem aqui?</label>
+      <textarea name="q24" placeholder="Compartilhe o que você valoriza..."></textarea>
+    </div>
+
+    <div class="card">
+      <label class="q-label"><span class="num">25.</span> Campo livre — observações, sugestões, críticas ou elogios</label>
+      <textarea name="q25" style="min-height: 120px;" placeholder="Escreva livremente..."></textarea>
+    </div>
+
+    <div class="submit-area">
+      <p class="anon-note">&#128274; Suas respostas são anônimas. Nenhuma informação de identificação é coletada sem sua permissão.</p>
+      <button type="submit" class="submit-btn" id="submit-btn">Enviar pesquisa</button>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  // Limite de 2 checkboxes
+  const checkboxes = document.querySelectorAll('.check-group input[type=checkbox]');
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', function() {
+      const checked = document.querySelectorAll('.check-group input[type=checkbox]:checked');
+      if (checked.length > 2) this.checked = false;
+    });
+  });
+
+  // Barra de progresso
+  function updateProgress() {
+    const names = ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14','q15','q16','q17','q18','q20','q21'];
+    let answered = 0;
+    names.forEach(n => {
+      if (document.querySelector('[name="' + n + '"]:checked')) answered++;
+    });
+    document.getElementById('progress').style.width = Math.round((answered / names.length) * 100) + '%';
+  }
+  document.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener('change', updateProgress));
+
+  // Feedback visual no envio
+  document.getElementById('survey-form').addEventListener('submit', function() {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+  });
+</script>
+</body>
+</html>
