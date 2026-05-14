@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<!--
+╔══════════════════════════════════════════════════════════════════╗
+║  ✏️  CONFIGURAÇÃO NECESSÁRIA                                     ║
+║                                                                  ║
+║  1. Abra este arquivo no Bloco de Notas (ou qualquer editor)     ║
+║  2. Use Ctrl+F e procure por: COLE_AQUI_A_URL                    ║
+║  3. Substitua esse texto pela URL do seu Web App do Apps Script  ║
+║     Exemplo: https://script.google.com/macros/s/ABC123.../exec   ║
+║  4. Salve o arquivo                                              ║
+╚══════════════════════════════════════════════════════════════════╝
+-->
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -623,9 +634,14 @@
   }
   document.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener('change', updateProgress));
 
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYehrARa9CjdyuoXNwTrP3TAkdhHi9hTTob4_1-AG2c_PveJX0XF8li59X9BbGIztkXg/exechttps://script.google.com/macros/s/AKfycbxYehrARa9CjdyuoXNwTrP3TAkdhHi9hTTob4_1-AG2c_PveJX0XF8li59X9BbGIztkXg/exec';
+
   // Envio
-  function submitForm() {
-    // Coleta todas as respostas
+  async function submitForm() {
+    const btn = document.querySelector('.submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
     const data = {
       timestamp: new Date().toLocaleString('pt-BR'),
       nome: document.getElementById('nome').value || 'Anônimo',
@@ -644,13 +660,22 @@
     data.q24 = document.getElementById('q24').value;
     data.q25 = document.getElementById('q25').value;
 
-    // Aqui você pode substituir pelo envio real (fetch para backend, Google Sheets API, etc.)
-    console.log('Respostas coletadas:', data);
-
-    // Exibe mensagem de sucesso
-    document.getElementById('form-body').style.display = 'none';
-    document.getElementById('success').style.display = 'block';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      // no-cors não retorna erro mesmo se falhar, então assumimos sucesso
+      document.getElementById('form-body').style.display = 'none';
+      document.getElementById('success').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Enviar pesquisa';
+      alert('Erro ao enviar. Verifique sua conexão e tente novamente.');
+    }
   }
 </script>
 
