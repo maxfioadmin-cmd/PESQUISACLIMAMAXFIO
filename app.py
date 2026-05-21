@@ -7,10 +7,12 @@ import streamlit as st
 import requests
 from datetime import datetime
 
-# ================================================================
-# ✏️  COLE AQUI A URL DO SEU WEB APP (Google Apps Script)
-# ================================================================
-APPS_SCRIPT_URL = "COLE_AQUI_A_URL_DO_SEU_WEB_APP"
+# URL do Web App (Google Apps Script)
+APPS_SCRIPT_URL = "https://script.google.com/a/macros/maxfiocondutoreseletricos.com.br/s/AKfycbzVTdvU_Q3C14x7NRZBaa4I_C3vaE-Q7nuSq1wJ87GaD0TLagt4DrbH9k2mIMIre5M/exec"
+
+def salvar_sheets(dados: dict):
+    """Envia as respostas para o Google Sheets via Apps Script."""
+    requests.post(APPS_SCRIPT_URL, json=dados, timeout=10)
 
 # ----------------------------------------------------------------
 st.set_page_config(
@@ -223,41 +225,41 @@ with st.form("pesquisa", clear_on_submit=False):
 # ----------------------------------------------------------------
 if enviar:
     dados = {
-        "timestamp":            datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-        "nome":                 nome or "Anônimo",
-        "setor":                setor or "Não informado",
-        "q1":                   q1,
-        "q2":                   q2 or "",
-        "q3":                   q3 or "",
-        "q4":                   q4,
-        "q5":                   q5,
-        "q6":                   q6,
-        "q7":                   q7,
-        "q8":                   q8,
-        "q9":                   q9,
-        "q10":                  q10,
-        "q11":                  q11,
-        "q12":                  q12,
-        "q13":                  q13,
-        "q14":                  q14,
-        "q15":                  q15,
-        "q16":                  q16 or "",
-        "q17":                  q17 or "",
-        "q18":                  q18,
-        "beneficios_desejados": ", ".join(beneficios_sel) or "Nenhum selecionado",
-        "q20":                  q20 or "",
-        "q20_area":             q20_area,
-        "q21":                  q21,
-        "q22":                  q22,
-        "q23":                  q23,
-        "q24":                  q24,
-        "q25":                  q25,
+        "timestamp":                datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        "nome":                     nome or "Anônimo",
+        "setor":                    setor or "Não informado",
+        "q1_satisfacao_geral":      q1,
+        "q2_imagem_empresa":        q2 or "",
+        "q3_orgulho":               q3 or "",
+        "q4_clima_cultura":         q4,
+        "q5_reconhecimento":        q5,
+        "q6_recursos_materiais":    q6,
+        "q7_orientacao_tarefas":    q7,
+        "q8_relacionamento_colegas":q8,
+        "q9_relacionamento_superiores": q9,
+        "q10_comunicacao_interna":  q10,
+        "q11_etica_conduta":        q11,
+        "q12_transparencia_decisoes": q12,
+        "q13_autonomia_ideias":     q13,
+        "q14_carga_trabalho":       q14,
+        "q15_cargo_salario":        q15,
+        "q16_salario_mercado":      q16 or "",
+        "q17_qualificacoes_cargo":  q17 or "",
+        "q18_beneficios_recebidos": q18,
+        "q19_beneficios_desejados": ", ".join(beneficios_sel) or "Nenhum selecionado",
+        "q20_outras_funcoes":       q20 or "",
+        "q20_area_interesse":       q20_area,
+        "q21_treinamentos":         q21,
+        "q22_iniciativas_eficazes": q22,
+        "q23_sugestoes_semestre":   q23,
+        "q24_o_que_te_faz_bem":     q24,
+        "q25_observacoes_livres":   q25,
     }
 
     try:
-        requests.post(APPS_SCRIPT_URL, json=dados, timeout=10)
+        salvar_sheets(dados)
     except Exception as e:
-        st.warning(f"Aviso: não foi possível conectar ao Google Sheets ({e}). As respostas foram salvas localmente.")
+        st.warning(f"Aviso: não foi possível salvar no Google Sheets ({e}).")
 
     st.session_state.enviado = True
     st.rerun()
