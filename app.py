@@ -8,7 +8,7 @@ import requests
 from datetime import datetime
 
 # URL do Web App (Google Apps Script)
-APPS_SCRIPT_URL = "https://script.google.com/a/macros/maxfiocondutoreseletricos.com.br/s/AKfycbzc-vzUamtYpJr58ZSTBFQqJfIx-Ie5jXZRiLREKpGh0mHHVGPZ_LnPWAHhLn7xuCGOFQ/exec"
+APPS_SCRIPT_URL = "https://script.google.com/a/macros/maxfiocondutoreseletricos.com.br/s/AKfycbyCFSrdOBLitoqfvhhxWE39Sq7WKXiNQvkBZhoQPEfbmoanFNSopkRlltpCYFKjepyKKg/exec"
 
 def salvar_sheets(dados: dict):
     """Envia as respostas para o Google Sheets via Apps Script."""
